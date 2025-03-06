@@ -95,7 +95,7 @@ def initialize(
 
 
 def run(
-    code: code_type,
+    code: code_type, 
     decoder: decoder_type,
     error_rates: dict = {},
     iterations: int = 1,
@@ -104,6 +104,7 @@ def run(
     benchmark: Optional[BenchmarkDecoder] = None,
     mp_queue: Optional[Queue] = None,
     mp_process: int = 0,
+    custom_error_dict : dict = None,
     **kwargs,
 ):
     """Runs surface code simulation.
@@ -157,7 +158,8 @@ def run(
 
     if decode_initial:
         print(f"Running initial iteration", end="\r")
-        code.random_errors()
+        if custom_error_dict is None:
+            code.random_errors()
         decoder.decode(**kwargs)    
         code.logical_state
         if hasattr(code, "figure"):
@@ -170,7 +172,12 @@ def run(
 
     for iteration in range(iterations):
         print(f"Running iteration {iteration+1}/{iterations}", end="\r")
-        code.random_errors(**error_rates)
+
+        if custom_error_dict is None:
+            code.random_errors(**error_rates)
+        else:
+            code.set_custom_syndrome(custom_error_dict)
+
         decoder.decode(**kwargs)
         code.logical_state  # Must get logical state property to update code.no_error
         output["no_error"] += code.no_error
@@ -187,6 +194,9 @@ def run(
             **benchmark.data,
             **benchmark.lists_mean_var(),
         }
+
+    decoder_support = decoder.get_support()
+    output["matchings"] = [(key, value) for key, value in decoder_support.items() if value == -2]
 
     if mp_queue is None:
         return output

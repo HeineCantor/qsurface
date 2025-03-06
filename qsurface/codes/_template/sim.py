@@ -273,6 +273,18 @@ class PerfectMeasurements(ABC):
             for ancilla in self.ancilla_qubits[self.layer].values():
                 ancilla.measure()
 
+    def set_custom_syndrome(self, syndromeDict : dict, **kwargs):
+        """Sets custom errors for the next round of simulation.
+        """
+        for key in syndromeDict:
+            for layer in range(self.layers):
+                self.layer = layer
+                if layer == key[-1]:
+                    for ancilla in self.ancilla_qubits[layer].values():
+                        if ancilla.loc == key[:-1]:
+                            ancilla.measured_state = syndromeDict[key]
+                            ancilla.syndrome = syndromeDict[key]
+
     @staticmethod
     def _parse_boundary_coordinates(size, *args: float) -> List[float]:
         """Parse two locations on the lattice.

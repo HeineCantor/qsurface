@@ -50,6 +50,13 @@ class PerfectMeasurements(TemplateSimPM):
             self.figure.interact_axes["error_buttons"].active = False
         self.plot_ancilla("Ancilla-qubits measured", measure=True)
 
+    def set_custom_syndrome(self, syndromeDict, **kwargs):
+        super().set_custom_syndrome(syndromeDict, **kwargs)
+        if self.figure.interactive:
+            self.figure.interact_bodies["error_buttons"].set_active(0)
+            self.figure.interact_axes["error_buttons"].active = False
+        self.plot_ancilla("Ancilla-qubits measured", measure=False)
+
     def show_corrected(self, **kwargs):
         """Redraws the qubits and ancillas to show their states after decoding."""
         self.plot_data()
