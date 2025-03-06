@@ -95,7 +95,7 @@ def initialize(
 
 
 def run(
-    code: code_type, 
+    code: code_type,
     decoder: decoder_type,
     error_rates: dict = {},
     iterations: int = 1,
