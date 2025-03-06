@@ -157,7 +157,7 @@ def run(
     random.seed(seed)
 
     if decode_initial:
-        print(f"Running initial iteration", end="\r")
+        #print(f"Running initial iteration", end="\r")
         if custom_error_dict is None:
             code.random_errors()
         decoder.decode(**kwargs)    
@@ -171,7 +171,7 @@ def run(
     output = {"no_error": 0}
 
     for iteration in range(iterations):
-        print(f"Running iteration {iteration+1}/{iterations}", end="\r")
+        #print(f"Running iteration {iteration+1}/{iterations}", end="\r")
 
         if custom_error_dict is None:
             code.random_errors(**error_rates)
@@ -184,7 +184,7 @@ def run(
         if hasattr(code, "figure"):
             code.show_corrected()
 
-    print()  # for newline after /r
+    #print()  # for newline after /r
 
     if hasattr(code, "figure"):
         code.figure.close()
