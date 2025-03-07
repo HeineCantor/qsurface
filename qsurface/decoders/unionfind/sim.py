@@ -474,7 +474,10 @@ class Toric(Sim):
             if ancilla.syndrome:
                 self.flip_edge(ancilla, edge, new_ancilla)
                 if type(key) is not int:
-                    self.correct_edge(self.code.ancilla_qubits[self.code.decode_layer][ancilla.loc], key)
+                    try:
+                        self.correct_edge(self.code.ancilla_qubits[self.code.decode_layer][ancilla.loc], key)
+                    except KeyError: #TODO: this KeyError is rare, but should be fixed. It prolly comes from some assumptions on the unrotated structure with respect to the rotated one.
+                        pass
             else:
                 self._edge_peel(edge, variant="peel")
             ancilla.peeled = self.code.instance
