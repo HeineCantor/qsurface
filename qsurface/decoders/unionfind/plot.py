@@ -190,13 +190,17 @@ class Toric(SimToric, Plot):
             full: bool = False,
         ):
             """Adds a line corresponding to a half-edge to the figure."""
+            state_type = ancilla.state_type
+            if state_type == "xzzx":
+                state_type = "x"
+
             line = self._draw_line(
                 self.code._parse_boundary_coordinates(self.code.size[0], edge.qubit.loc[0], ancilla.loc[0]),
                 self.code._parse_boundary_coordinates(self.code.size[0], edge.qubit.loc[1], ancilla.loc[1]),
                 ls=self.params.line_style_primary if full else self.params.line_style_tertiary,
                 zorder=0,
                 lw=self.params.line_width_primary,
-                color=self.colors2[ancilla.state_type],
+                color=self.colors2[state_type],
             )
             line.object = edge
             line.instance = instance
@@ -235,14 +239,19 @@ class Toric(SimToric, Plot):
                 ),
                 "z": lambda x, y: (x, y - self.params.patch_rectangle_2d * 2 ** (1 / 2) / 2),
             }
+
+            state_type = ancilla.state_type
+            if state_type == "xzzx":
+                state_type = "x"
+
             # Plot ancilla object
             ancilla.uf_plot = self._draw_rectangle(
-                loc_parse[ancilla.state_type](*ancilla.loc),
+                loc_parse[state_type](*ancilla.loc),
                 self.params.patch_rectangle_2d,
                 self.params.patch_rectangle_2d,
-                rotations[ancilla.state_type],
-                edgecolor=self.colors1[ancilla.state_type],
-                facecolor=self.colors2[ancilla.state_type],
+                rotations[state_type],
+                edgecolor=self.colors1[state_type],
+                facecolor=self.colors2[state_type],
                 linewidth=self.params.line_width_primary,
                 picker=self.params.blocking_pick_radius,
                 zorder=1,
@@ -255,12 +264,15 @@ class Toric(SimToric, Plot):
         def _flip_ancilla(self, ancilla: AncillaQubit):
             """Flips the state of the ancilla on the figure."""
             if ancilla.syndrome:
+                state_type = ancilla.state_type
+                if state_type == "xzzx":
+                    state_type = "x"
                 if hasattr(ancilla, "uf_plot"):
                     self.new_properties(
                         ancilla.uf_plot,
                         {
-                            "edgecolor": self.colors1[ancilla.state_type],
-                            "facecolor": self.colors2[ancilla.state_type],
+                            "edgecolor": self.colors1[state_type],
+                            "facecolor": self.colors2[state_type],
                         },
                     )
                 else:

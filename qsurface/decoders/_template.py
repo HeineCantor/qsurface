@@ -193,7 +193,15 @@ class Sim(ABC):
     def get_neighbor(ancilla_qubit: AncillaQubit, key: str) -> Tuple[AncillaQubit, Edge]:
         """Returns the neighboring ancilla-qubit of ``ancilla_qubit`` in the direction of ``key``."""
         data_qubit = ancilla_qubit.parity_qubits[key]
-        edge = data_qubit.edges[ancilla_qubit.state_type]
+
+        state_type = ancilla_qubit.state_type
+        if state_type == "xzzx":
+            if ancilla_qubit in data_qubit.edges['x'].nodes:
+                state_type = "x"
+            else:
+                state_type = "z"
+
+        edge = data_qubit.edges[state_type]
         neighbor = edge.nodes[not edge.nodes.index(ancilla_qubit)]
         return neighbor, edge
 
@@ -221,6 +229,23 @@ class Sim(ABC):
         (next_qubit, edge) = self.get_neighbor(ancilla_qubit, key)
         edge.state = not edge.state
         return next_qubit
+
+    def get_general_syndrome(self, find_pseudo: bool = False) -> Tuple[LA, LA]:
+        """Finds the syndrome of the code.
+
+        Parameters
+        ----------
+        find_pseudo : bool, optional
+            If enabled, the lists of syndromes returned are not only `~.codes.elements.AncillaQubit` objects, but tuples of ``(ancilla, pseudo)``, where ``pseudo`` is the closest `~.codes.elements.PseudoQubit` in the boundary of the code.
+        Returns
+        -------
+        list
+            Operator syndromes.
+        """
+        if find_pseudo is False:
+            return [ancilla for layer in self.code.ancilla_qubits.values() for ancilla in layer.values() if ancilla.syndrome]
+        else:
+            return [(ancilla, self.code.pseudo_qubits[ancilla.z][ancilla.loc]) for layer in self.code.ancilla_qubits.values() for ancilla in layer.values() if ancilla.syndrome]
 
     def get_syndrome(self, find_pseudo: bool = False) -> Union[Tuple[LA, LA], Tuple[LTAP, LTAP]]:
         """Finds the syndrome of the code.

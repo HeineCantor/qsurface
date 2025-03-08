@@ -215,8 +215,14 @@ class Toric(Sim):
 
         The cluster is then placed into a bucket based on its size and parity by `place_bucket`. See `grow_clusters` for more information on buckets.
         """
-        plaqs, stars = self.get_syndrome()
-        for ancilla in plaqs + stars:
+
+        if self.code.name != "xzzx":
+            plaqs, stars = self.get_syndrome()
+            syndromes = plaqs + stars
+        else:
+            syndromes = self.get_general_syndrome()
+
+        for ancilla in syndromes:
             if ancilla.cluster is None or ancilla.cluster.instance != self.code.instance:
                 cluster = self._Cluster(self.cluster_index, self.code.instance)
                 self.cluster_add_ancilla(cluster, ancilla)

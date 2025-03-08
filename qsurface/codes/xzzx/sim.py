@@ -37,29 +37,29 @@ class PerfectMeasurements(ToricPM):
                     commute *= -1
                     parity(self.add_ancilla_qubit((0.5 - 1 * (y%2) + x, y + 0.5), z=z, state_type="xzzx", **kwargs))
 
-        # outer_qubits = self.size[0] // 2
+        outer_qubits = self.size[0] // 2
 
-        # for x in range(outer_qubits): # for first and last row
-        #     parity(self.add_ancilla_qubit((0.5 + 2*x, -0.5), z=z, state_type=self._syndrome_dict[1], **kwargs))
-        #     parity(self.add_ancilla_qubit((self.size[0] - 1.5 - 2*x, self.size[1] - 0.5), z=z, state_type=self._syndrome_dict[1], **kwargs))
+        for x in range(outer_qubits): # for first and last row
+            parity(self.add_ancilla_qubit((0.5 + 2*x, -0.5), z=z, state_type="xzzx", **kwargs))
+            parity(self.add_ancilla_qubit((self.size[0] - 1.5 - 2*x, self.size[1] - 0.5), z=z, state_type="xzzx", **kwargs))
 
-        # # Add pseudo qubits to surface (boundaries)
-        # if self.size[1] % 2 == 1:
-        #     for y in range(self.size[1] - 1):
-        #         if y % 2 == 0:
-        #             parity(self.add_pseudo_qubit((-0.5, y + 0.5), z=z, state_type=self._syndrome_dict[1], **kwargs))
-        #         else:
-        #             parity(self.add_pseudo_qubit((self.size[0] - 0.5, y + 0.5), z=z, state_type=self._syndrome_dict[1], **kwargs))
-        # else:
-        #     for y in range(self.size[1] - 1):
-        #         if y % 2 == 0:
-        #             parity(self.add_pseudo_qubit((-0.5, y + 0.5), z=z, state_type=self._syndrome_dict[1], **kwargs))
-        #             parity(self.add_pseudo_qubit((self.size[0] - 0.5, y + 0.5), z=z, state_type=self._syndrome_dict[1], **kwargs))
+        # Add pseudo qubits to surface (boundaries)
+        if self.size[1] % 2 == 1:
+            for y in range(self.size[1] - 1):
+                if y % 2 == 0:
+                    parity(self.add_pseudo_qubit((-0.5, y + 0.5), z=z, state_type="xzzx", **kwargs))
+                else:
+                    parity(self.add_pseudo_qubit((self.size[0] - 0.5, y + 0.5), z=z, state_type="xzzx", **kwargs))
+        else:
+            for y in range(self.size[1] - 1):
+                if y % 2 == 0:
+                    parity(self.add_pseudo_qubit((-0.5, y + 0.5), z=z, state_type="xzzx", **kwargs))
+                    parity(self.add_pseudo_qubit((self.size[0] - 0.5, y + 0.5), z=z, state_type="xzzx", **kwargs))
 
-        # for x in range(self.size[0]+1):
-        #     if x % 2 == 0 or x >= (outer_qubits)*2:
-        #         parity(self.add_pseudo_qubit((x - 0.5, - 0.5), z=z, state_type=self._syndrome_dict[x % 2], **kwargs))
-        #         parity(self.add_pseudo_qubit((self.size[0] - 0.5 - x, self.size[1] - 0.5), z=z, state_type=self._syndrome_dict[x % 2], **kwargs))
+        for x in range(self.size[0]+1):
+            if x % 2 == 0 or x >= (outer_qubits)*2:
+                parity(self.add_pseudo_qubit((x - 0.5, - 0.5), z=z, state_type="xzzx", **kwargs))
+                parity(self.add_pseudo_qubit((self.size[0] - 0.5 - x, self.size[1] - 0.5), z=z, state_type="xzzx", **kwargs))
 
     def init_parity_check(self, ancilla_qubit: AncillaQubit, **kwargs):
         """Initiates a parity check measurement.
@@ -80,15 +80,14 @@ class PerfectMeasurements(ToricPM):
         }
         for key, loc in checks.items():
             if loc in self.data_qubits[z]:
-                self.entangle_pair(self.data_qubits[z][loc], ancilla_qubit, key, state_type=self._syndrome_dict[int(key[0]*key[1] > 0)])
+                self.entangle_pair(self.data_qubits[z][loc], ancilla_qubit, key, state_type=self._syndrome_dict[int(key[0]*key[1] < 0)])
 
     def init_logical_operator(self, **kwargs):
         """Initiates the logical operators [x,z] of the rotated code."""
-        # operators = {
-        #     "x": [self.data_qubits[self.decode_layer][(i, 0)].edges["x"] for i in range(self.size[0])],
-        #     "z": [self.data_qubits[self.decode_layer][(0, i)].edges["z"] for i in range(self.size[1])],
-        # }
-        operators = {}
+        operators = {
+            "x": [self.data_qubits[self.decode_layer][(i, self.size[1]-i-1)].edges["x"] for i in range(self.size[0])],
+            "z": [self.data_qubits[self.decode_layer][(i, i)].edges["z"] for i in range(self.size[1])],
+        }
         self.logical_operators = operators
 
 
