@@ -225,6 +225,7 @@ class PerfectMeasurements(ABC):
         ancilla_qubit: AncillaQubit,
         key: Any,
         edge: Optional[Edge] = None,
+        state_type: Optional[str] = None,
         **kwargs,
     ):
         """Entangles one `~.codes.elements.DataQubit` to a `~.codes.elements.AncillaQubit` for parity measurement.
@@ -242,7 +243,9 @@ class PerfectMeasurements(ABC):
         """
         ancilla_qubit.parity_qubits[key] = data_qubit
         if edge is None:
-            edge = data_qubit.edges[ancilla_qubit.state_type]
+            if state_type is None:
+                state_type = ancilla_qubit.state_type
+            edge = data_qubit.edges[state_type]
         edge.add_node(ancilla_qubit)
 
     """

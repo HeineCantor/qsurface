@@ -671,3 +671,6 @@ class Planar(Toric):
 
 class Rotated(Planar):
     pass
+
+class Xzzx(Rotated):
+    pass

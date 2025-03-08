@@ -142,7 +142,19 @@ class AncillaQubit(Qubit):
         """
         parity = False
         for data_qubit in self.parity_qubits.values():
-            if data_qubit.state[self.state_type]:
+            state_type = self.state_type
+            if state_type == "xzzx":
+                if data_qubit.loc[0] + 0.5 == self.loc[0]: # The data qubit is on the left
+                    if data_qubit.loc[1] + 0.5 == self.loc[1]: # The data qubit is at the bottom
+                        state_type = "x"
+                    else: # The data qubit is at the top        
+                        state_type = "z"
+                else: # The data qubit is on the right
+                    if data_qubit.loc[1] + 0.5 == self.loc[1]: # The data qubit is at the bottom
+                        state_type = "z"
+                    else: # The data qubit is at the top
+                        state_type = "x"
+            if data_qubit.state[state_type]:
                 parity = not parity
 
         p_measure = p_bitflip_plaq if self.state_type == "x" else p_bitflip_star

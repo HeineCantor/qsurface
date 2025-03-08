@@ -280,10 +280,22 @@ class PerfectMeasurements(TemplateSimPM):
             # Plot graph edges
             qubit.surface_lines = {}
             for key, data in qubit.parity_qubits.items():
+                state_type = qubit.state_type
+                if state_type == "xzzx":
+                    if data.loc[0] + 0.5 == qubit.loc[0]:
+                        if data.loc[1] + 0.5 == qubit.loc[1]:
+                            state_type = "x"
+                        else:
+                            state_type = "z"
+                    else:
+                        if data.loc[1] + 0.5 == qubit.loc[1]:
+                            state_type = "z"
+                        else:
+                            state_type = "x"
                 line = self._draw_line(
                     self.code._parse_boundary_coordinates(self.code.size[0], qubit.loc[0], data.loc[0]),
                     self.code._parse_boundary_coordinates(self.code.size[1], qubit.loc[1], data.loc[1]),
-                    ls=linestyles[qubit.state_type],
+                    ls=linestyles[state_type],
                     zorder=0,
                     lw=self.params.line_width_primary,
                     color=self.params.color_edge,
@@ -292,17 +304,20 @@ class PerfectMeasurements(TemplateSimPM):
                 qubit.surface_lines[key] = line
                 line.object = qubit  # Save qubit to artist
 
+            state_type = qubit.state_type
+            if state_type == "xzzx": # just draw the x ancilla
+                state_type = "x"
             # Plot ancilla object
             rectangle = self._draw_rectangle(
-                loc_parse[qubit.state_type](*qubit.loc),
+                loc_parse[state_type](*qubit.loc),
                 self.params.patch_rectangle_2d,
                 self.params.patch_rectangle_2d,
-                rotations[qubit.state_type],
+                rotations[state_type],
                 picker=self.params.blocking_pick_radius,
                 zorder=1,
                 lw=self.params.line_width_primary,
                 z=z,
-                **getattr(self.params, f"{qubit.state_type}ancilla0"),
+                **getattr(self.params, f"{state_type}ancilla0"),
             )
             qubit.surface_plot = rectangle
             rectangle.object = qubit  # Save qubit to artist
@@ -323,9 +338,13 @@ class PerfectMeasurements(TemplateSimPM):
             """
             state = qubit.state if measure else qubit.measured_state
 
-            properties = getattr(self.params, f"{qubit.state_type}ancilla{int(state)}")
+            state_type = qubit.state_type
+            if state_type == "xzzx": # just draw the x ancilla
+                state_type = "x"
+
+            properties = getattr(self.params, f"{state_type}ancilla{int(state)}")
             properties["edgecolor"] = (
-                getattr(self.params, f"color_{qubit.state_type}_primary")
+                getattr(self.params, f"color_{state_type}_primary")
                 if qubit.measurement_error
                 else self.params.color_qubit_edge
             )
