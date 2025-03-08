@@ -316,6 +316,10 @@ class Toric(SimToric, Plot):
                 if abs(edge_z - ancilla.z) > 1:
                     edge_z = self.code.layers - edge.z
 
+            state_type = ancilla.state_type
+            if state_type == "xzzx":
+                state_type = "x"
+
             line = self._draw_line3D(
                 self.code._parse_boundary_coordinates(self.code.size[0], edge.qubit.loc[0], ancilla.loc[0]),
                 self.code._parse_boundary_coordinates(self.code.size[0], edge.qubit.loc[1], ancilla.loc[1]),
@@ -323,7 +327,7 @@ class Toric(SimToric, Plot):
                 ls=self.params.line_style_primary if full else self.params.line_style_tertiary,
                 zorder=0,
                 lw=self.params.line_width_primary,
-                color=self.colors2[ancilla.state_type],
+                color=self.colors2[state_type],
             )
             line.object = edge
             line.instance = instance
