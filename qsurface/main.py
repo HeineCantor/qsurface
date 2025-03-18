@@ -87,7 +87,11 @@ def initialize(
     Decoder_flow = getattr(Decoder, "plot") if plotting else getattr(Decoder, "sim")
     Decoder_flow_code = getattr(Decoder_flow, Code.__name__.split(".")[-1].capitalize())
 
-    code = Code_flow_dim(size, **kwargs)
+    layers = None
+    if len(size) > 2:
+        layers = int(size[2])
+
+    code = Code_flow_dim(size, layers=layers, **kwargs)
     code.initialize(*enabled_errors, **kwargs)
     decoder = Decoder_flow_code(code, **kwargs)
 
