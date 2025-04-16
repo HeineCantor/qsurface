@@ -182,9 +182,11 @@ def run(
         else:
             code.set_custom_syndrome(custom_error_dict)
 
-        decoder.decode(**kwargs)
+        copySupport = decoder.decode(**kwargs)
         code.logical_state  # Must get logical state property to update code.no_error
         output["no_error"] += code.no_error
+        if copySupport:
+            output["prematchings"] = copySupport
         if hasattr(code, "figure"):
             code.show_corrected()
 

@@ -124,7 +124,11 @@ class Toric(Sim):
         self.support = {edge: 0 for edge in self.support}
         self.find_clusters(**kwargs)
         self.grow_clusters(**kwargs)
+        # VALIDATION FOR CUSTOM IMPL
+        copySupport = self.support.copy()
         self.peel_clusters(**kwargs)
+
+        return copySupport
 
     """
     -------------------------------------------------------------------------------------------
