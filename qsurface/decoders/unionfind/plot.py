@@ -34,9 +34,10 @@ class Toric(SimToric, Plot):
             self.figure = self.Figure2D(self, self.name, plot_params=params, **kwargs)
         elif self.code.__class__.__name__ == "FaultyMeasurements":
             self.figure = self.Figure3D(self, self.name, plot_params=params, **kwargs)
-        super().decode(*args, **kwargs)
+        tmp = super().decode(*args, **kwargs)
         # self.figure.draw_figure("Press (->/enter) to close decoder figure.")
         self.figure.close()
+        return tmp
 
     def find_clusters(self, **kwargs):
         # Inherited docstring
